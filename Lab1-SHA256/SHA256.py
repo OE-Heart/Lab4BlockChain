@@ -100,31 +100,25 @@ def SHA256(message):
     return "".join(format(h, "02x") for h in b"".join(H))
 
 if __name__ == '__main__':
-    print("Enter a sequence: ")
-    s = input()
-    result = SHA256(s)
-    print("SHA256 result: " + result)
-    
-    bin_str = "".join([bin(ord(result[i])).replace("0b", "") for i in range(len(result))])
+    s = ""
+    zero_cnt = 30
+    zero_vec = [0]*zero_cnt
+    zero_str = "".join([str(zero_vec[i]) for i in range(zero_cnt)])
 
-    zero_cnt = 0
+    i = 8500000000
     time_start = time.perf_counter()
+    while (True):
+        result = SHA256(s+str(i))
+        bin_str = "".join(['{:04b}'.format(int(result[i], 16)).replace("0b", "") for i in range(len(result))])
+        if (i % 10000 == 0):
+            time_now = time.perf_counter()
 
-    for i in range(len(bin_str)):
-        if bin_str[i] == 1:
-            continue
+            print("i = "+str(i)+ " :", time_now-time_start, 's')
+        if (bin_str[0:zero_cnt] == zero_str):
+            time_now = time.perf_counter()
+            print(s+str(i))
+            print(result)
+            print("Time used: ", time_now-time_start, 's')
+            break
         else:
-            zero_cnt += 1
-            if (zero_cnt == 6):
-                time_zero_6 = time.perf_counter()
-            elif (zero_cnt == 8):
-                time_zero_8 = time.perf_counter()
-            elif (zero_cnt == 10):
-                time_zero_10 = time.perf_counter()
-                break
-            else:
-                continue
-
-    print("Time to find the 6th 0: ", int((time_zero_6-time_start)*1000000000), 'ns')
-    print("Time to find the 8th 0: ", int((time_zero_8-time_start)*1000000000), 'ns')
-    print("Time to find the 10th 0: ", int((time_zero_10-time_start)*1000000000), 'ns')
+            i += 1
